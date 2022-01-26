@@ -31,20 +31,20 @@ void err_sys(char *msg)
 }
 
 int main(int argc, char *argv[]){
-	time_t start, end, execute_time;
-	char user_input[50];
+	int start, end, execute_time; // time variables
+	char user_input[50], result[20],final[50]="\nexecute time: "; // string for command input
 	for (int i=0; i<argc-1; i++){
-		strcat(user_input," ");
-		strcat(user_input,*++argv);
+		if (i>0) strcat(user_input," "); // adds space between arguements 
+		strcat(user_input,*++argv); // adds arguements to string
 	}
-	printf("input: %s\n", user_input);
-	if(write(STDIN_FILENO,user_input,strlen(user_input)) != strlen(user_input)){
+	start = (int)time(NULL); // time of start
+	system(user_input); // executes specified command
+	end = (int)time(NULL); // time of end
+	execute_time = end - start; // difference = total time
+	snprintf(result,10,"%d",execute_time); // converts to string to print
+	strcat(final,strcat(result,"\n")); // adds newline character
+	if(write(STDOUT_FILENO,final,strlen(final)) != strlen(final)){ // writes to stdout
 			err_sys("write to STDOUT error");
 		}
-	start = time(NULL);
-	system(user_input);
-	end = time(NULL);
-	execute_time = end - start;
-	printf("\nSeconds to execute: %ld\n", execute_time);
 	return 0;
 }
