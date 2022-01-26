@@ -12,8 +12,12 @@ timer.o: timer.c
 	$(CC) $(CFLAGS) -c  $<
 piper.o: piper.c 
 	$(CC) $(CFLAGS) -c  $<
-test: 
-	
+timertest: 
+	./timer sleep 1s
+	./timer sleep 2s
+	./timer sleep 3s
+	./timer sleep 4s
+	./timer sleep 5s
 clean: 
 	rm timer
 	rm piper
