@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <time.h>
 
@@ -30,20 +31,23 @@ void err_sys(char *msg) // error handler
 	exit(-1);
 }
 int main(int argc, char *argv[]){
-	int start, end, execute_time; // time variables
-	char user_input[50],result[20],final[50]="\nexecute time: "; // string for command input
-	for (int i=0; i<argc-1; i++){
-		if (i>0) strcat(user_input," "); // adds space between arguements 
-		strcat(user_input,*++argv); // adds arguements to string
-	}
-	start = (int)time(NULL); // time of start
-	system(user_input); // executes specified command
-	end = (int)time(NULL); // time of end
-	execute_time = end - start; // difference = total time
-	snprintf(result,10,"%d",execute_time); // converts to string to print
-	strcat(final,strcat(result,"\n")); // adds newline character to result and concats to final
-	if(write(STDOUT_FILENO,final,strlen(final)) != strlen(final)){ // writes final string to stdout
-			err_sys("write to STDOUT error"); // calls errror if write fails
+	
+	int 	child, wpid, start, end, execute_time, status=0; 		// time variables
+	char 	result[20],final[]="\nexecute time: "; 	// string for command input
+	
+	start = (int)time(NULL); 				// time of start
+	if ((child = fork()) == 0) {
+        execvp(argv[1],&argv[1]);
+        exit(0);
+    }
+	if(child<0) err_sys("\nfork error"); 	// read pipe from parent
+	while((wpid = wait(&status))>0); 		// waits for child to finish
+	end = (int)time(NULL); 					// time of end
+	execute_time = end - start; 			// difference = total time
+	snprintf(result,10,"%d",execute_time); 	// converts to string to print
+	strcat(final,strcat(result,"\n")); 		// adds newline character to result and concats to final
+	if(write(STDOUT_FILENO,final,strlen(final)) != strlen(final)){ 	// writes final string to stdout
+			err_sys("write to STDOUT error"); 						// calls errror if write fails
 		}
 	return 0;
 }
