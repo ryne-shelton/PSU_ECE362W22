@@ -13,7 +13,8 @@
  * 				executes the command, and prints out the commands execution time 
  *
  */
- 
+//========================================================================================================
+// Libraries 
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -25,22 +26,22 @@
 #include <fcntl.h>
 #include <time.h>
 
-void err_sys(char *msg) // error handler
-{
+void err_sys(char *msg){					// error handler
 	fprintf(stderr,"%s (%s)\n",msg,strerror(errno));
 	exit(-1);
 }
+//========================================================================================================
 int main(int argc, char *argv[]){
-	
-	int 	child, wpid, start, end, execute_time, status=0; 		// time variables
-	char 	result[20],final[]="\nexecute time: "; 	// string for command input
-	
+	int 	child, wpid, start, end, execute_time, status=0; 	// variables
+	char 	result[20],final[]="\nexecute time: "; 				// string for command input	
 	start = (int)time(NULL); 				// time of start
-	if ((child = fork()) == 0) {
-        execvp(argv[1],&argv[1]);
-        exit(0);
+//--------------------------------------------------------------------------------------------------------
+	if ((child = fork()) == 0) {			// creates child process
+        execvp(argv[1],&argv[1]);			// executes user command
+        exit(0);	
     }
-	if(child<0) err_sys("\nfork error"); 	// read pipe from parent
+	if(child<0) err_sys("\nfork error"); 	// generates error if child creation fails
+//--------------------------------------------------------------------------------------------------------
 	while((wpid = wait(&status))>0); 		// waits for child to finish
 	end = (int)time(NULL); 					// time of end
 	execute_time = end - start; 			// difference = total time
@@ -51,3 +52,4 @@ int main(int argc, char *argv[]){
 		}
 	return 0;
 }
+//========================================================================================================
